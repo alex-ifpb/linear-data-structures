@@ -13,4 +13,5 @@ Este repositório reúne diferente implementações na Linguagem `Python` de Est
 | Lista Sequencial | Lista usando `list` como array, Lista usando array `NumPy` |
 | Pilha Encadeada | Pilha simplesmente encadeada |
 | Pilha Sequencial  | Pilha usando array `NumPy` |
-| Fila Encadeada | Fila encadeada com `head` and `tail`, fila sequencial circular |
+| Fila Encadeada | Fila encadeada com `head` and `tail`
+| Fila Sequencial | Fila sequencial circular usando array `NumPy` |
