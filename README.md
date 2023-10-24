@@ -4,7 +4,9 @@ Este repositório reúne diferente implementações na Linguagem `Python` de Est
 
 ## Autor
 Professor Alex Sandro da Cunha Rêgo
+
 Lattes: http://lattes.cnpq.br/1582109846489096
+
 Doutor em Ciência da Computação
 
 ## Pré-Requisitos

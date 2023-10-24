@@ -108,7 +108,7 @@ class Lista:
             cursor = cursor.next
             contador += 1
             
-        raise ListaException(f'A chave {key} não está armazenado na lista')
+        raise ListaException(f'A chave {chave} não está armazenado na lista')
 
     def inserir(self, posicao:int, carga:any ):
         try:
