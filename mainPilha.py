@@ -1,5 +1,5 @@
-#from pilha_sequencial.PilhaSequencialNumPy import *
-from pilha_encadeada.PilhaEncadeada import *
+from pilha_sequencial.PilhaSequencialNumPy import *
+#from pilha_encadeada.PilhaEncadeada import *
 
 p1 = Pilha()
 
@@ -29,7 +29,7 @@ try:
     print(p1)
 
     
-except PilhaException as pe:
+except PilhaError as pe:
     print('ERRO:',pe)
 except Exception as e:
     print('Erro:',e,'Classe: ',e.__class__.__name__)

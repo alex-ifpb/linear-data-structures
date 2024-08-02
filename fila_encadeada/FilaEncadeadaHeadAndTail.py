@@ -1,4 +1,4 @@
-class FilaException(Exception):
+class FilaError(Exception):
     """Classe de exceção lançada quando uma violação de acesso aos elementos
        da fila é identificada.
     """
@@ -87,14 +87,14 @@ class Fila:
             any: o conteudo armazenado na frente da fila (tipo primitivo ou objeto).
 
         Raises:
-            FilaException: Exceção lançada quando a fila não possui elementos
+            FilaError: Exceção lançada quando a fila não possui elementos
         Examples:
             f = Fila()
             ...   # considere que temos internamente a fila frente->[10,20,30,40]
             print (f.elementoDaFrente()) # exibe 10
         """
         if self.estaVazia():
-            raise FilaException(f'Fila Vazia. Não há elemento a recuperar.')
+            raise FilaError(f'Fila Vazia. Não há elemento a recuperar.')
         return self.__inicio.carga
 
     def busca(self, chave:any)->int:
@@ -111,7 +111,7 @@ class Fila:
                  encontrada a "chave" de busca.
 
         Raises:
-            FilaException: Exceção lançada quando o argumento "key"
+            FilaError: Exceção lançada quando o argumento "key"
                   não está presente na fila.
 
         Examples:
@@ -128,7 +128,7 @@ class Fila:
             cursor = cursor.prox
             contador += 1
 
-        raise FilaException(f'Chave {chave} inexistente na fila')
+        raise FilaError(f'Chave {chave} inexistente na fila')
   
     def elemento(self, posicao:int)->any:
         """ Método que recupera o conteudo armazenado em uma determinada posição
@@ -143,7 +143,7 @@ class Fila:
             any: o conteudo correspondente à posição indicada na fila.
 
         Raises:
-            FilaException: Exceção lançada quando a posição não é válida para a fila atual
+            FilaError: Exceção lançada quando a posição não é válida para a fila atual
         Examples:
             f = Fila()
             ...   # considere que temos internamente a fila  frente->[10,20,30,40]
@@ -151,7 +151,7 @@ class Fila:
         """
         try:
             if self.estaVazia():
-                raise FilaException('Fila Vazia.')
+                raise FilaError('Fila Vazia.')
             assert posicao > 0 and posicao <= self.__tamanho
             cursor = self.__inicio
             contador = 1
@@ -162,9 +162,9 @@ class Fila:
             return cursor.carga
             
         except TypeError:
-            raise FilaException(f'A posicao referente ao elemento deve ser do tipo inteiro')
+            raise FilaError(f'A posicao referente ao elemento deve ser do tipo inteiro')
         except AssertionError:
-            raise FilaException(f'Posicao invalida. Forneça um valor entre 1 e {self.__tamanho}.')
+            raise FilaError(f'Posicao invalida. Forneça um valor entre 1 e {self.__tamanho}.')
         except:
             raise
 
@@ -197,7 +197,7 @@ class Fila:
             qualquer tipo de dado: o conteúdo referente ao elemento removido
 
         Raises:
-            FilaException: Exceção lançada quando se tenta remover algo de uma fila vazia
+            FilaError: Exceção lançada quando se tenta remover algo de uma fila vazia
                     
         Examples:
             f = Fila()
@@ -219,7 +219,7 @@ class Fila:
             return carga
             
         except AssertionError as ae:
-            raise FilaException(f'A fila está vazia! Não é possivel remover elementos')
+            raise FilaError(f'A fila está vazia! Não é possivel remover elementos')
          
     def __str__(self):
         """ Método que retorna uma string com a ordem dos elementos

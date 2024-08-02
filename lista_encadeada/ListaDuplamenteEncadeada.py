@@ -1,4 +1,4 @@
-class ListaException(Exception):
+class ListaError(Exception):
     def __init__(self, msg):
         super().__init__(msg)
 
@@ -46,13 +46,93 @@ class Lista:
         self.__head = None
         self.__tamanho = 0
 
-    def estaVazia(self):
+    def estaVazia(self)->bool:
+        '''
+        Verifica se a lista está vazia
+        Retorno:
+            True se a lista estiver vazia
+            False caso contrário
+        '''
         return self.__tamanho == 0
 
-    def __len__(self):
-        return self.__tamanho
-    
+    def elemento(self, posicao:int)->any:
+        '''
+        Retorna a carga armazenada no nó correspondente à posicao indicada.
+        Parâmetros:
+            posicao (int): posição do nó cuja carga se deseja obter
+        Retorno:
+            a carga do nó correspondente à posicao indicada
+        Raises:
+            ListaError: caso a posicao indicada seja inválida ou a lista esteja vazia
+        '''        
+        try:
+            assert posicao > 0 and posicao <= len(self)
+            cont = 1
+            cursor = self.__head
+            while( cursor != None ):
+                if cont == posicao:
+                    break
+                cont += 1
+                cursor = cursor.prox
+            
+            return cursor.carga
+        except AssertionError:
+            raise ListaError('Posicao invalida. Lista contém {self.__tamanho} elementos')        
+
+    def busca(self, chave:any)->int:
+        '''
+        Verifica a existência da chave de busca na lista e retorna a posição do nó que a contém.
+        Parâmetros:
+            key (any): a chave de busca
+        Retorno:
+            a posição do nó que contém a chave de busca
+        Raises:
+            ListaError: caso a chave não seja encontrada ou a lista esteja vazia
+        '''        
+        cont = 1
+        cursor = self.__head
+        while( cursor != None ):
+            if cursor.carga == chave:
+                return cont
+            cont += 1
+            cursor = cursor.prox
+
+        raise ListaError(f'Chave {chave} não encontrada na Lista')        
+
+    def modificar(self, posicao:int, novaCarga:any):
+        '''
+        Modifica a carga do nó correspondente à posicao indicada.
+        Parâmetros:
+            posicao (int): posição do nó cuja carga se deseja modificar
+            carga (any): a nova carga do nó
+        Raises:
+            ListaError: caso a posicao indicada seja inválida ou a lista esteja vazia
+        '''        
+        try:
+            assert posicao > 0 and posicao <= len(self),f'Posicao invalida. Lista contém {self.__tamanho} elementos'
+            assert not self.estaVazia(),'Lista vazia'
+            cont = 1
+            cursor = self.__head
+            while( cursor != None ):
+                if cont == posicao:
+                    break
+                cont += 1
+                cursor = cursor.prox
+            
+            cursor.carga = novaCarga
+
+        except AssertionError as ae:
+            raise ListaError(ae.__str__())
+        
     def inserir(self, posicao:int, carga:any):
+        '''
+        Insere um novo nó na lista, na posicao indicada, contendo a carga fornecida.
+        Parâmetros:
+            posicao (int): a posição do nó na lista
+            carga (any): a carga do nó
+        Raises:
+            ListaError: caso a posicao indicada seja inválida
+        '''
         try:
             assert posicao > 0 and posicao <= self.__tamanho + 1
 
@@ -88,21 +168,36 @@ class Lista:
             self.__tamanho += 1
 
         except TypeError:
-            raise ListaException(f'A posição deve ser um número inteiro')            
+            raise ListaError(f'A posição deve ser um número inteiro')            
         except AssertionError:
-            raise ListaException(f'A posicao deve ser um numero maior que zero e menor igual a {self.__tamanho+1}')
+            raise ListaError(f'A posicao deve ser um numero maior que zero e menor igual a {self.__tamanho+1}')
         except:
             raise
 
     def append(self, carga:any):
+        '''
+        Insere um novo nó no final da lista, com a carga fornecida.
+        Parâmetros:
+            carga (any): a carga do nó
+        '''
         self.inserir(self.__tamanho+1, carga)
 
     def remover(self, posicao:int)->any:
+        '''
+        Remove o nó da lista correspondnete à posicao indicada, e retorna a sua carga.
+        Parâmetros:
+            posicao (int): a posição do nó na lista
+        Retorno:
+            a carga do nó removido
+        Raises:
+            ListaError: se a posição for inválida ou a lista estiver vazia
+        '''        
         try:
-            assert posicao > 0 and posicao <= self.__tamanho
+            assert not self.estaVazia(),'Lista vazia'
+            assert posicao > 0 and posicao <= self.__tamanho, f'A posicao deve ser maior que zero e menor igual a {self.__tamanho}'
 
             if( self.estaVazia() ):
-                raise ListaException(f'Não é possível remover de uma lista vazia')
+                raise ListaError(f'Não é possível remover de uma lista vazia')
 
             cursor = self.__head
             contador = 1
@@ -126,56 +221,16 @@ class Lista:
             return carga
         
         except TypeError:
-            raise ListaException(f'A posição deve ser um número inteiro')            
-        except AssertionError:
-            raise ListaException(f'A posicao não pode ser um número negativo')
+            raise ListaError(f'A posição deve ser um número inteiro')            
+        except AssertionError as ae:
+            raise ListaError(ae.__str__() )
         except:
             raise
 
-    def busca(self, chave:any)->int:
-        cont = 1
-        cursor = self.__head
-        while( cursor != None ):
-            if cursor.carga == chave:
-                return cont
-            cont += 1
-            cursor = cursor.prox
-
-        raise ListaException(f'Chave {chave} não encontrada na Lista')        
-
-    def elemento(self, posicao:int)->any:
-        try:
-            assert posicao > 0 and posicao <= len(self)
-            cont = 1
-            cursor = self.__head
-            while( cursor != None ):
-                if cont == posicao:
-                    break
-                cont += 1
-                cursor = cursor.prox
-            
-            return cursor.carga
-        except AssertionError:
-            raise ListaException('Posicao invalida. Lista contém {self.__tamanho} elementos')        
-
-    def modificar(self, posicao:int, novaCarga:any):
-        try:
-            assert posicao > 0 and posicao <= len(self),f'Posicao invalida. Lista contém {self.__tamanho} elementos'
-            assert not self.estaVazia(),'Lista vazia'
-            cont = 1
-            cursor = self.__head
-            while( cursor != None ):
-                if cont == posicao:
-                    break
-                cont += 1
-                cursor = cursor.prox
-            
-            cursor.carga = novaCarga
-
-        except AssertionError as ae:
-            raise ListaException(ae.__str__())
-        
     def __str__(self):
+        '''
+        Retorna uma representação em string da lista
+        '''
         s = '[ '
         # código base para percorrer qualquer estrutura linear
         cursor = self.__head
@@ -189,23 +244,41 @@ class Lista:
     # Método mágico em Python, que quando usado em uma classe, permite que
     # a instância da classe utilize a sintaxe do operador  [] para indexar
     # seus elementos
-    def __getitem__( self , index):
-        return self.elemento(index)
+    def __getitem__( self, posicao:int):
+        return self.elemento(posicao)
     
-    # Método mágico para permitir a iteração entre elementos
-    def __iter__(self):
-        self.n = 0
-        return self
+    def __setitem__( self, posicao, novaCarga):
+        self.modificar(posicao, novaCarga)
 
-    def __next__(self):
-        if self.n < self.__tamanho:
-            self.n += 1
-            return self.elemento(self.n)
-        else:
+    def __iter__(self)->any:
+        self.__ponteiro = self.__head
+        return self
+    
+    def __next__(self)->any:
+        if (self.__ponteiro == None):
             raise StopIteration
+        else:
+            carga = self.__ponteiro.carga
+            self.__ponteiro = self.__ponteiro.prox
+            return carga
+    
+    def __len__(self):
+        return self.__tamanho
+
 
     # Método mágico para emular o comportamento do objeto à chamada da
     # função reversed()
+    # def __reversed__(self):
+    #     for i in range(self.__tamanho,0,-1):
+    #         yield self.elemento( i ) 
+    
     def __reversed__(self):
-        for i in range(self.__tamanho,0,-1):
-            yield self.elemento( i ) 
+        self.__ponteiro = self.__head
+        #posiciona no último elemento
+        while(self.__ponteiro.prox is not None):
+            self.__ponteiro = self.__ponteiro.prox
+        #percorre a lista de trás para frente
+        while(self.__ponteiro is not None):
+            yield self.__ponteiro.carga
+            self.__ponteiro = self.__ponteiro.ant
+        

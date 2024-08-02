@@ -1,4 +1,4 @@
-from lista_encadeada.ListaDuplamenteEncadeada import Lista,ListaException
+from lista_encadeada.ListaDuplamenteEncadeada import Lista,ListaError
 lst = Lista()
 try:
     lst.inserir(1,25)
@@ -46,7 +46,7 @@ try:
         print(lst.remover(1))
     print(lst)
 
-except ListaException as le:
+except ListaError as le:
     print(le)  
 except Exception as e:
     print('Classe: ', e.__class__.__name__)

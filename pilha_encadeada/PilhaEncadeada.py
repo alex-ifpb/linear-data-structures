@@ -1,4 +1,4 @@
-class PilhaException(Exception):
+class PilhaError(Exception):
     """Classe de exceção lançada quando uma violação de acesso aos elementos
        da pilha é identificada.
     """
@@ -10,17 +10,23 @@ class PilhaException(Exception):
 
 
 class Node:
-    def __init__(self, dado:any):
-        self.__dado = dado
+    '''
+    Classe que implementa um nó de uma lista encadeada simples.
+    Atributos:
+        carga (any): a carga armazenada no nó
+        prox (Node): o apontador para o próximo nó da lista
+    '''
+    def __init__(self, carga:any):
+        self.__carga = carga
         self.__prox = None
 
     @property
-    def dado(self)->any:
-        return self.__dado
+    def carga(self)->any:
+        return self.__carga
     
-    @dado.setter
-    def dado(self, dado):
-        self.__dado = dado
+    @carga.setter
+    def carga(self, carga):
+        self.__carga = carga
 
     @property
     def prox(self)->'Node':
@@ -30,11 +36,11 @@ class Node:
     def prox(self, prox:'Node'):
         self.__prox = prox
 
-    def temProximo(self)->'Node':
+    def temProximo(self)->bool:
         return self.__prox != None
     
     def __str__(self):
-        return str(self.__dado)
+        return str(self.__carga)
 
 
 class Pilha:
@@ -61,11 +67,10 @@ class Pilha:
         Returns:
             boolean: True se a pilha estiver vazia, False caso contrário
 
-        Examples:
+        Examplo de uso:
             p = Pilha()
-            # considere que temos internamente na pilha  topo->[10,20,30,40]
-            if(p.estaVazia()): #
-               # instrucoes
+            if(p.estaVazia()): 
+               <instrucoes>
         """
         return self.__head == None
 
@@ -75,10 +80,10 @@ class Pilha:
         Returns:
             int: um número inteiro que determina o número de elementos existentes na pilha
 
-        Examples:
+        Examplo de uso:
             p = Pilha()
             # considere que temos internamente a pilha topo->[10,20,30,40]
-            print (p.tamanho()) # exibe 4
+            print (len(p)) # exibe 4
         """        
 
         return self.__tamanho
@@ -87,41 +92,37 @@ class Pilha:
         """ Método que recupera o valor armazenado em um determinado elemento da pilha
 
         Argumentos:
-            posicao (int): o elemento que deseja obter a carga.
+            posicao (int): a posicao do elemento que deseja obter a carga. 
             A ordem dos elementos é na direção da base até o topo da pilha.
+            A base é o primeiro elemento (1) e o topo é o último (n).
         
         Returns:
             any: a carga armazenada na ordem indicada por posição.
 
         Raises:
-            PilhaException: Exceção lançada quando uma posição inválida é
+            PilhaError: Exceção lançada quando uma posição inválida é
                   fornecida pelo usuário. São inválidas posições que se referem a:
                   (a) números negativos
                   (b) zero
                   (c) número natural correspondente a um elemento que excede a
                       quantidade de elementos existentes na pilha.                      
-        Examples:
+        Examplo de uso:
             p = Pilha()
-            # considere que temos internamente a pilha topo->[10,20,30,40]
-            print (p.elemento(3)) # exibe 30
+            print (p.elemento(3)) 
         """
         try:
             assert not self.estaVazia(), 'A pilha está vazia'
-            assert posicao > 0 and posicao <= len(self),f'A posicao {posicao} NAO é válida para a pilha de tamanho {self.__tamanho}'
+            assert  0 < posicao <= len(self), f'A posicao {posicao} NAO é válida para a pilha de tamanho {self.__tamanho}'
  
             cursor = self.__head
-            contador = 1
-            steps = len(self) - posicao
-            while(cursor != None and contador <= steps ):
-                contador += 1
+            for _ in range( len(self)-posicao):
                 cursor = cursor.prox
-
-            return cursor.dado
+            return cursor.carga
                 
         except TypeError:
-            raise PilhaException('Digite um número inteiro referente ao elemento desejado')
+            raise PilhaError('o argumento "posicao" deve ser um número inteiro')
         except AssertionError as ae:
-            raise PilhaException(ae.__str__(),'elemento()')
+            raise PilhaError(ae.__str__())
         except:
             raise
 
@@ -136,61 +137,58 @@ class Pilha:
         Returns:
             int: um número inteiro representando a posição, na pilha, em que foi
                  encontrada a  "chave". A posição é contada a partir da base da
-                 pilha, em direção ao topo
+                 pilha (1), em direção ao topo (n)
 
         Raises:
-            PilhaException: Exceção lançada quando a chave não 
+            PilhaError: Exceção lançada quando a chave não 
                   estiver presente na pilha.
 
-        Examples:
+        Examplo de uso:
             p = Pilha()
-            # considere que temos internamente na pilha  topo-> [10,20,30,40]
-            print (p.elemento(40)) # exibe 4
+            print (p.busca(10)) 
         """
-
         cursor = self.__head
-        contador = 1
+        contador = len(self)
 
         while( cursor != None):
-            if cursor.dado == chave:
-                return (len(self) - contador)+1
+            if cursor.carga == chave:
+                return contador
             cursor = cursor.prox
-            contador += 1
+            contador -= 1
 
-        raise PilhaException(f'Chave {chave} nao esta na pilha','busca()')
+        raise PilhaError(f'Chave {chave} nao esta na pilha')
         
     def topo(self)->any:
-        """ Método que devolve o elemento localizado no topo, sem desempilhá-lo
+        """ Método que devolve a carga que se encontra no topo da pilha, sem desempilhá-la
     
         Returns:
             any: o conteúdo referente ao elemento do topo
 
         Raises:
-            PilhaException: Exceção lançada quando se tenta consultar o topo de uma
+            PilhaError: Exceção lançada quando se tenta consultar o topo de uma
                    uma pilha vazia
                     
-        Examples:
+        Examplo de uso:
             p = Pilha()
-            ...   # considere que temos internamente a lista [10,20,30,40]
             dado = p.topo()
-            print(dado) # exibe 40
+            print(dado) 
         """
         if not self.estaVazia():
-            return self.__head.dado
-        raise PilhaException('A pilha está vazia')
+            return self.__head.carga
+        raise PilhaError('A pilha está vazia')
     
 
     def empilha(self, carga:any):
         """ Método que adiciona um novo elemento ao topo da pilha
 
-        Argumentoss:
+        Argumentos:
             carga(any): o conteúdo a ser inserido no topo da pilha.
 
-        Examples:
+        Examplo de uso:
             p = Pilha()
             # considere a pilha  topo->[10,20,30,40]
             p.empilha(50)
-            print(p)  # exibe [10,20,30,40,50]
+            print(p)  # exibe topo->[50,10,20,30,40]
         """
         novo = Node(carga)
         novo.prox = self.__head
@@ -200,47 +198,38 @@ class Pilha:
 
     def desempilha(self)->any:
         """ Método que remove um elemento do topo da pilha e devolve 
-            a carga correspondente a esse elemento removido.
+            a carga armazenada.
     
         Returns:
             any: a carga removida do topo da pilha
 
         Raises:
-            PilhaException: Exceção lançada quando se tenta remover de uma pilha vazia
+            PilhaError: Exceção lançada quando se tenta remover de uma pilha vazia
                     
-        Examples:
+        Examplo de uso:
             p = Pilha()
-            # considere que temos internamente a pilha [10,20,30,40]<-topo
             dado = p.desemplha()
-            print(p) # exibe [10,20,30]
-            print(dado) # exibe 40
+            print(p)
+            print(dado) 
         """
         if not self.estaVazia():
-            dado = self.__head.dado
+            carga = self.__head.carga
             self.__head = self.__head.prox
             self.__tamanho -= 1
-            return dado
-        raise PilhaException('A pilha está vazia')
+            return carga
+        raise PilhaError('A pilha está vazia')
    
-
-
-    
     def __str__(self):
         """ Método que devolve uma string contendo os elementos da pilha
             separados por vírgula e entre colchetes. A ordem de exibição é
             da base para o topo da pilha.   
         """
         cursor = self.__head
-        primeiro = True
         s = 'topo->['
         while( cursor != None):
-            if primeiro:
-                s += f'{cursor.dado}'
-                primeiro = False
-            else:
-                s += f', {cursor.dado}'
+            s += f'{cursor.carga}, '
             cursor = cursor.prox
-
+        s = s.strip(', ')
         s += ']'
         return s
 

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class ListaException(Exception):
+class ListaError(Exception):
     """Classe de exceção lançada quando uma violação de ordem genérica
        da lista é identificada.
     """
@@ -27,7 +27,7 @@ class Lista:
         try:
             assert size > 0
         except AssertionError:
-            raise  ListaException("Tamanho do array deve ser um número maior do que zero.")
+            raise  ListaError("Tamanho do array deve ser um número maior do que zero.")
         
         self.__dado = np.full(size,None)
         self.__final = 0 # Indica o índice até onde se tem elementos no array
@@ -86,7 +86,7 @@ class Lista:
             any: a carga armazenada na ordem indicada por posição.
 
         Raises:
-            ListaException: Exceção lançada quando uma posição inválida é
+            ListaError: Exceção lançada quando uma posição inválida é
                   fornecida pelo usuário. São inválidas posições que se referem a:
                   (a) números negativos
                   (b) zero
@@ -100,10 +100,10 @@ class Lista:
         """
         try:
             if posicao > 0 and posicao > len(self):
-                raise ListaException(f"Posicao {posicao} invalida para recuperacao.")
+                raise ListaError(f"Posicao {posicao} invalida para recuperacao.")
             return self.__dado[posicao-1]
         except TypeError:
-            raise ListaException(f'O tipo de dado para posicao não é um número inteiro')
+            raise ListaError(f'O tipo de dado para posicao não é um número inteiro')
 
     def modificar(self, posicao:int, carga:any):
         """ Método que altera o conteúdo armazenado em um elemento específico da lista
@@ -113,7 +113,7 @@ class Lista:
             valor (qualquer tipo primitivo): o novo valor que vai ser armazenado no elemento Ei
         
         Raises:
-            ListaException: Exceção lançada quando uma posição inválida é
+            ListaError: Exceção lançada quando uma posição inválida é
                   fornecida pelo usuário. São inválidas posições que se referem a:
                   (a) números negativos
                   (b) zero
@@ -130,9 +130,9 @@ class Lista:
             assert posicao > 0 and posicao <= len(self)
             self.__dado[posicao-1] = carga
         except TypeError:
-            raise ListaException(f'O tipo de dado para posicao não é do tipo inteiro')
+            raise ListaError(f'O tipo de dado para posicao não é do tipo inteiro')
         except AssertionError:
-            raise ListaException(f'A posicao não pode ser um número negativo ou maior que a quantidade atual de elementos')
+            raise ListaError(f'A posicao não pode ser um número negativo ou maior que a quantidade atual de elementos')
         except:
             raise
 
@@ -149,7 +149,7 @@ class Lista:
                  encontrado "valor".
 
         Raises:
-            ListaException: Exceção lançada quando o argumento "chave"
+            ListaError: Exceção lançada quando o argumento "chave"
                   não está presente na lista.
 
         Examples:
@@ -161,7 +161,7 @@ class Lista:
         for i in range(self.__final):
             if (self.__dado[i] == chave):
                 return i+1
-        raise ListaException(f'Chave {chave} nao esta na lista')
+        raise ListaError(f'Chave {chave} nao esta na lista')
 
 
     def inserir(self, posicao:int, carga:any ):
@@ -174,7 +174,7 @@ class Lista:
                   na lista.
 
         Raises:
-            ListaException: Exceção lançada quando uma posição inválida é
+            ListaError: Exceção lançada quando uma posição inválida é
                   fornecida pelo usuário. São inválidas posições que se referem a:
                   (a) números negativos
                   (b) zero
@@ -197,9 +197,9 @@ class Lista:
             self.__dado[posicao-1] = carga
             self.__final += 1
         except AssertionError as ae:
-            raise ListaException(ae.__str__())
+            raise ListaError(ae.__str__())
         except TypeError:
-            raise ListaException(f'O tipo de dado para posicao não é um número inteiro')
+            raise ListaError(f'O tipo de dado para posicao não é um número inteiro')
  
 
     def remover(self, posicao:int)->any:
@@ -213,7 +213,7 @@ class Lista:
             qualquer tipo primitivo: o valor encontrado no elemento removido
 
         Raises:
-            ListaException: Exceção lançada quando uma posição inválida é
+            ListaError: Exceção lançada quando uma posição inválida é
                   fornecida pelo usuário. São inválidas posições que se referem a:
                   (a) números negativos
                   (b) zero
@@ -227,7 +227,7 @@ class Lista:
             print(dado) # exibe 20
         """
         if self.estaVazia():
-            raise ListaException('Pilha vazia. Nao há elementos para remoção.')
+            raise ListaError('Pilha vazia. Nao há elementos para remoção.')
         try:
             assert posicao > 0 and posicao <= len(self),f'Posicao invalida para remocao. Informe um numero de 1 a {self.__len__()}'
 
@@ -239,10 +239,25 @@ class Lista:
             self.__final -= 1
             return carga
         except TypeError:
-            raise ListaException(f'O tipo de dado para posicao não é um número inteiro')
+            raise ListaError(f'O tipo de dado para posicao não é um número inteiro')
         except AssertionError as ae:
-            raise ListaException(ae)
+            raise ListaError(ae)
    
+   # Métodos para implementação do protocolo "Iterator"
+    def __iter__(self):
+        self.__cursor = 0
+        return self
+    
+    def __next__(self):
+        if self.__cursor < self.__final:
+            carga = self.__dado[self.__cursor]
+            self.__cursor += 1
+            return carga
+        raise StopIteration
+    
+    def __reversed__(self):
+        for i in range(self.__final,0,-1):
+            yield self.__dado[i-1]
 
         
     def __str__(self)->str:

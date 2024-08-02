@@ -1,6 +1,6 @@
-#from fila_sequencial.FilaSequencialCircularList import *
-#from fila_encadeada.FilaEncadeadaNoCabeca import *
-#from fila_encadeada.FilaEncadeadaHeadAndTail import *
+# from fila_sequencial.FilaSequencialCircularList import *
+# from fila_encadeada.FilaEncadeadaNoCabeca import *
+# from fila_encadeada.FilaEncadeadaHeadAndTail import *
 from fila_sequencial.FilaSequencialCircularNumPy import *
 
 f = Fila()
@@ -31,7 +31,7 @@ try:
 
 
  
-except FilaException as fe:
+except FilaError as fe:
     print(fe)
 except Exception as e:
     print('Classe: ', e.__class__.__name__, ' msg: ', e)

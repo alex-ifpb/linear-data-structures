@@ -1,6 +1,6 @@
 import numpy as np
 
-class FilaException(Exception):
+class FilaError(Exception):
     """Classe de exceção lançada quando uma violação de acesso aos elementos
        da fila é identificada.
     """
@@ -17,7 +17,7 @@ class Fila:
        A classe permite que qualquer tipo de dado seja armazenada na fila.
 
      Attributes:
-        dado (list): uma estrutura de armazenamento sequencial dos elementos da
+        dado (np.ndaary): um array para armazenamento sequencial dos elementos da
              fila
     """
     def __init__(self, tamanho = 10):
@@ -27,8 +27,7 @@ class Fila:
             tamanho (int): um número inteiro que determina o tamanho máximo da fila. 
                            Se não for informado, o tamanho padrão será 10.
         """
-        self.__max = tamanho
-        self.__dado = np.full(self.__max, None)
+        self.__dado = np.full(tamanho, None)
         self.__frente = 0
         self.__final = -1
         self.__tam = 0
@@ -59,7 +58,7 @@ class Fila:
             if(f.estaCheia()): #
                # instrucoes
         """
-        return self.__tam == self.__max 
+        return self.__tam == len(self.__dado)
 
     def __len__(self)->int:
         """ Método que consulta a quantidade de elementos existentes na fila
@@ -83,17 +82,16 @@ class Fila:
             any: o conteudo armazenado na frente da fila (tipo primitivo ou objeto).
 
         Raises:
-            FilaException: Exceção lançada quando a fila não possui elementos
+            FilaError: Exceção lançada quando a fila não possui elementos
         Examples:
             f = Fila()
             ...   # considere que temos internamente a fila frente->[10,20,30,40]
             print (f.elementoDaFrente()) # exibe 10
         """
         if self.estaVazia():
-            raise FilaException(f'Fila Vazia. Não há elemento a recuperar.')
+            raise FilaError(f'Fila Vazia. Não há elemento a recuperar.')
 
-        carga = self.__dado[self.__frente]
-        return carga
+        return self.__dado[self.__frente]
 
     
     def busca(self, key: any)->int:
@@ -110,7 +108,7 @@ class Fila:
                  encontrada a "chave" de busca.
 
         Raises:
-            FilaException: Exceção lançada quando o argumento "key"
+            FilaError: Exceção lançada quando o argumento "key"
                   não está presente na fila.
 
         Examples:
@@ -122,9 +120,9 @@ class Fila:
         for i in range(1,self.__tam+1):
             if self.__dado[frente] == key:
                 return i
-            frente = (frente + 1)% self.__max
+            frente = (frente + 1)% len(self.__dado)
                 
-        raise FilaException(f'A chave {key} não está armazenado na fila')
+        raise FilaError(f'A chave {key} não está armazenado na fila')
 
     def elemento(self, posicao:int)->any:
         """ Método que recupera o conteudo armazenado em uma determinada posição
@@ -139,7 +137,7 @@ class Fila:
             any: o conteudo correspondente à posição indicada na fila.
 
         Raises:
-            FilaException: Exceção lançada quando a posição não é válida para a fila atual
+            FilaError: Exceção lançada quando a posição não é válida para a fila atual
         Examples:
             f = Fila()
             ...   # considere que temos internamente a fila  frente->[10,20,30,40]
@@ -149,11 +147,11 @@ class Fila:
             assert posicao > 0 and posicao <= self.__tam
             frente = self.__frente
             for i in range(posicao-1):
-                frente = (frente + 1) % self.__max
+                frente = (frente + 1) % len(self.__dado)
 
             return self.__dado[frente]
         except AssertionError:
-            raise FilaException(f'Posicao inválida para a fila atual com {self.__tam} elementos')
+            raise FilaError(f'Posicao inválida para a fila atual com {self.__tam} elementos')
 
     def enfileirar(self, valor:any ):
         """ Método que adiciona um novo elemento na frente da fila
@@ -168,10 +166,10 @@ class Fila:
             print(f)  # exibe [10,20,30,40,50]
         """
         if self.estaCheia():
-            raise FilaException(f'Fila cheia. Não é possível inserir elementos')
+            raise FilaError(f'Fila cheia. Não é possível inserir elementos')
 
         self.__tam +=1
-        self.__final = (self.__final + 1) % self.__max
+        self.__final = (self.__final + 1) % len(self.__dado)
         self.__dado[ self.__final ] = valor
         
 
@@ -184,7 +182,7 @@ class Fila:
             qualquer tipo de dado: o conteúdo referente ao elemento removido
 
         Raises:
-            FilaException: Exceção lançada quando se tenta remover algo de uma fila vazia
+            FilaError: Exceção lançada quando se tenta remover algo de uma fila vazia
                     
         Examples:
             f = Fila()
@@ -194,11 +192,11 @@ class Fila:
             print(dado) # exibe 10
         """
         if self.estaVazia():
-            raise FilaException(f'Fila Vazia. Não há elemento a remover.')
+            raise FilaError(f'Fila Vazia. Não há elemento a remover.')
 
         carga = self.elementoDaFrente()
         self.__tam -= 1
-        self.__frente = (self.__frente + 1)% self.__max
+        self.__frente = (self.__frente + 1)% len(self.__dado)
 
         return carga
 
@@ -210,9 +208,9 @@ class Fila:
         str = 'Frente-> [ '
 
         frente = self.__frente
-        for i in range(self.__tam):
+        for _ in range(self.__tam):
             str += f'{self.__dado[frente]}, '
-            frente = (frente + 1) % self.__max
+            frente = (frente + 1) % len(self.__dado)
         str = str.rstrip(', ')
         str += ' ]'
         return str

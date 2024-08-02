@@ -1,5 +1,5 @@
-from deque.DequeSequencialNumPy import Deque, DequeException
-#from deque.DequeEncadeado import Deque, DequeException
+from deque.DequeSequencialNumPy import Deque, DequeError
+#from deque.DequeEncadeado import Deque, DequeError
 
 d = Deque(5)
 try:
@@ -20,5 +20,5 @@ try:
     print(d)
     d.addFront(10)
     print(d)
-except DequeException as de:
+except DequeError as de:
     print(de)

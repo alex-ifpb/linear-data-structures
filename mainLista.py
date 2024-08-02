@@ -1,6 +1,6 @@
-from lista_sequencial.ListaSequencialNumPy import Lista, ListaException
-#from lista_encadeada.ListaSimplesmenteEncadeada import Lista, ListaException
-#from lista_encadeada.ListaEncadeadaCircular import Lista, ListaException   
+from lista_sequencial.ListaSequencialNumPy import Lista, ListaError
+#from lista_encadeada.ListaSimplesmenteEncadeada import Lista, ListaError
+#from lista_encadeada.ListaEncadeadaCircular import Lista, ListaError   
 
 lst = Lista()
 try:
@@ -28,8 +28,6 @@ try:
     lst.modificar(3, 99)
     print('Modificar(3,99):', lst)
     #lst.busca(40)
-
-
     carga = lst.remover(3)
     print('Remover(3):', carga)
     print(lst)
@@ -41,10 +39,19 @@ try:
     print(lst)
 
     #valor = lst.remover(15)
+    print('Testando o iterador:')
+    for carga in lst:
+        print(carga,end=' ')
 
-    input('Pressione qualquer tecla para finalizar...')
+    # só funciona o for abaixo se estiver implementado o __reverse__()
+    print('\nTestando o __reverse__():')
+    for e in reversed(lst):
+        print(f'{e},', end=' ')
+    print()
 
-except ListaException as le:
+    input('\nPressione qualquer tecla para finalizar...')
+
+except ListaError as le:
     print(le)
 except Exception as e:
     print('Nossos engenheiros vao analisar esse problema')
