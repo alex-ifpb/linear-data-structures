@@ -1,6 +1,6 @@
 lista_hibrida/
 lista_sequencial/ListaNewOperations.py
 fila_sequencial/FilaSequencialPlus.py
-lista_encadeada/ListaEncadeadaOrdenada.py
-mainListaOrdenada.py
+fila_sequencial/FilaSequencialCircularList.py
+fila_sequencial/FilaSequencialList.py
 */__pycache__

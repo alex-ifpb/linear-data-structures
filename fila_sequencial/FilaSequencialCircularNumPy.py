@@ -74,7 +74,7 @@ class Fila:
         return self.__tam
 
 
-    def elementoDaFrente(self)->any:
+    def frente(self)->any:
         """ Método que recupera o conteudo armazenado no elemento da frente da fila,
             sem removê-lo.
 
@@ -86,7 +86,7 @@ class Fila:
         Examples:
             f = Fila()
             ...   # considere que temos internamente a fila frente->[10,20,30,40]
-            print (f.elementoDaFrente()) # exibe 10
+            print (f.frente()) # exibe 10
         """
         if self.estaVazia():
             raise FilaError(f'Fila Vazia. Não há elemento a recuperar.')
@@ -108,7 +108,7 @@ class Fila:
                  encontrada a "chave" de busca.
 
         Raises:
-            FilaError: Exceção lançada quando o argumento "key"
+            KeyError: Exceção lançada quando o argumento "key"
                   não está presente na fila.
 
         Examples:
@@ -122,9 +122,9 @@ class Fila:
                 return i
             frente = (frente + 1)% len(self.__dado)
                 
-        raise FilaError(f'A chave {key} não está armazenado na fila')
+        raise KeyError(f'A chave {key} não está armazenado na fila')
 
-    def elemento(self, posicao:int)->any:
+    def get(self, posicao:int)->any:
         """ Método que recupera o conteudo armazenado em uma determinada posição
             da fila, sem removê-lo.
 
@@ -141,7 +141,7 @@ class Fila:
         Examples:
             f = Fila()
             ...   # considere que temos internamente a fila  frente->[10,20,30,40]
-            print (f.elemento(3)) # retorna 30
+            print (f.get(3)) # retorna 30
         """
         try:
             assert posicao > 0 and posicao <= self.__tam
@@ -194,7 +194,7 @@ class Fila:
         if self.estaVazia():
             raise FilaError(f'Fila Vazia. Não há elemento a remover.')
 
-        carga = self.elementoDaFrente()
+        carga = self.frente()
         self.__tam -= 1
         self.__frente = (self.__frente + 1)% len(self.__dado)
 
@@ -214,3 +214,35 @@ class Fila:
         str = str.rstrip(', ')
         str += ' ]'
         return str
+
+    def __iter__(self)->any:
+        self.__index = 1
+        self.__cursor = self.__frente
+        return self
+    
+    def __next__(self)->any:
+        if (self.__index > self.__tam):
+            raise StopIteration
+        else:
+            carga = self.__dado[self.__cursor]
+            self.__cursor = (self.__cursor + 1) % len(self.__dado)
+            self.__index += 1
+            return carga
+
+    def __contains__(self, key:any)->bool:
+        '''
+        Método que verifica se uma chave está presente na fila.
+        Acionado em situações de uso do operador "in": "if chave in fila".
+        Argumentos:
+            key(Any): chave do elemento a ser buscado.
+        Retorna:
+            bool: True se a chave estiver na fila e False caso contrário.
+        '''
+        try:
+            self.busca(key)
+            return True
+        except KeyError:
+            return False
+
+    def __getitem__( self, posicao:int):
+        return self.get(posicao)    

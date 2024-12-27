@@ -1,9 +1,7 @@
-
 class ListaError(Exception):
     """Classe de exceção lançada quando uma violação de ordem genérica
        da lista é identificada.
     """
-
     def __init__(self,msg):
         """ Construtor padrão da classe, que recebe uma mensagem que se deseja
             embutir na exceção
@@ -40,9 +38,13 @@ class Node:
     def __str__(self):
         return str(self.__data)
 
+   	    
 class Lista:
     '''
-    Classe de objetos para uma lista simplesmente encadeada
+    Classe de objetos para armazenamento e gerenciamento de elementos
+    de uma lista simplesmente encadeada ordenada.
+    Nesse tipo de lista, os elementos são inseridos de forma ordenada
+    de acordo com a chave de ordenação.
     '''
     def __init__(self):
         self.__head = None
@@ -52,18 +54,17 @@ class Lista:
         '''
         Verifica se a lista está vazia
         Retorno:
-            True se a lista estiver vazia
-            False caso contrário
+          True se a lista estiver vazia e False caso contrário
         '''
         return self.__tamanho == 0 
 
     def get(self, posicao:int)->any:
         '''
-        Retorna o conteúdo armazenado em uma determinada posição da lista
+        Retorna a carga armazenada em uma determinada posição da lista
         Parâmetros:
-            posicao(int): um número inteiro positivo
+          posicao(int): a posição do elemento desejado
         Retorno:
-            A carga armazenada na posição indicada
+          A carga armazenada na posição especificada
         Raises:
             ListaError: se a posição for inválida ou a lista estiver vazia
         '''
@@ -85,23 +86,37 @@ class Lista:
     def modificar(self, posicao:int, carga: any):
         '''
         Modifica a carga de um elemento especificado pela posição
-        indicada como parâmetro.
+        indicada como parâmetro. A chave da carga tem que manter a lista ordenada.
         Parâmetros:
           posicao(int): a posição do elemento desejado
           carga(any): a nova carga do elemento
         Raises:
-            ListaError: se a posição for inválida ou a lista estiver vazia
+            ListaError: se a posição for inválida ou se a lista estiver vazia
+            ou se a chave da carga não mantiver a lista ordenada
         ''' 
         try:
-            assert posicao > 0, f'A posicao não pode ser 0 (zero) ou um número negativo'
-            assert posicao <= len(self), f'Posicao invalida. Lista contém {self.__tamanho} elementos'
             assert not self.estaVazia(), 'Lista vazia'
+            assert posicao > 0 and posicao <= len(self), f'Posicao invalida. Lista contém {self.__tamanho} elementos'
 
             cursor = self.__head
             contador = 1
-            while( cursor != None and contador < posicao ):
+
+            while( contador <= posicao-1 ) :
+                anterior = cursor
                 cursor = cursor.next
-                contador += 1
+                contador+=1
+                
+            if cursor.next == None:
+                if contador == 1: # se a posicao for a primeira
+                    pass # não faz nada, vai para a linha de atribuição de carga
+                elif anterior.data > carga:
+                    raise ListaError(f'A chave {carga} na posição {posicao} não mantém a lista ordenada')
+                # se passar daqui, a carga é maior que a anterior e está no final da lista
+            elif posicao == 1: # se a posicao for a primeira em uma lista com mais de um elemento
+                if carga > cursor.next.data:
+                    raise ListaError(f'A chave {carga} na posição {posicao} não mantém a lista ordenada')
+            elif anterior.data > carga or carga > cursor.next.data:
+                raise ListaError(f'A chave {carga} na posicao {posicao} não mantém a lista ordenada')
 
             cursor.data = carga
         except TypeError:
@@ -109,7 +124,7 @@ class Lista:
         except AssertionError as ae:
             raise ListaError(ae.__str__())
    
-    
+       
     def busca(self, chave:any)->int:
         '''
         Busca um elemento na lista a partir de uma chave fornecida 
@@ -120,7 +135,7 @@ class Lista:
             a posição do elemento na lista
         Raises:
             KeyError: se a chave não for encontrada ou a lista estiver vazia
-        '''        
+        '''
         if (self.estaVazia()):
             raise ListaError(f'Lista vazia')
 
@@ -135,59 +150,29 @@ class Lista:
             
         raise KeyError(f'A chave {chave} não está armazenado na lista')
 
-    def inserir(self, posicao:int, carga:any ):
+    def inserir(self, carga:any ):
         '''
-        Insere um elemento em uma determinada posição da lista
+        Insere um elemento na lista de forma ordenada.
         Parâmetros:
-            posicao(int): a posição onde a nova chave será inserida
-            carga(any): a chave (carga) a ser inserida
-        Raises:
-            ListaError: se a posição for inválida
-        '''        
-        try:
-            assert posicao > 0 and posicao <= len(self)+1, f'Posicao invalida. Lista contém {self.__tamanho} elementos' 
-
-            # CONDICAO 1: insercao se a lista estiver vazia
-            if (self.estaVazia()):
-                if ( posicao != 1):
-                    raise ListaError(f'A lista esta vazia. A posicao correta para insercao é 1.')
-
-                self.__head = Node(carga)
-                self.__tamanho += 1
-                return
-            
+            carga(any): a carga do elemento a ser inserido
+        '''
+        # CONDICAO 1: insercao se a lista estiver vazia
+        novoNo = Node(carga)
+        if (self.estaVazia()):
+            self.__head = novoNo
+        elif (carga < self.__head.data):
             # CONDICAO 2: insercao na primeira posicao em uma lista nao vazia
-            if ( posicao == 1):
-                novo = Node(carga)
-                novo.next = self.__head
-                self.__head = novo
-                self.__tamanho += 1
-                return
-
+            novoNo.next = self.__head
+            self.__head = novoNo
+        else:
             # CONDICAO 3: insercao apos a primeira posicao em lista nao vazia
             cursor = self.__head
-            contador = 1
-            while ( contador < posicao-1):
+            while (cursor.next is not None and cursor.next.data < carga):
                 cursor = cursor.next
-                contador += 1
 
-            novo = Node(carga)
-            novo.next = cursor.next
-            cursor.next = novo
-            self.__tamanho += 1
-
-        except TypeError:
-            raise ListaError(f'A posição deve ser um número inteiro')            
-        except AssertionError:
-            raise ListaError(f'A posicao não pode ser um número negativo ou 0 (zero)')
-
-    def append(self, carga:any):
-        '''
-        Insere um novo nó no final da lista, com a carga fornecida.
-        Parâmetros:
-            carga (any): a carga do nó
-        '''
-        self.inserir(len(self)+1, carga)
+            novoNo.next = cursor.next
+            cursor.next = novoNo
+        self.__tamanho += 1
 
     def remover(self, posicao:int)->any:
         '''
@@ -229,8 +214,22 @@ class Lista:
         except AssertionError:
             raise ListaError(f'A posicao não pode ser um número negativo')
       
-              
-    def __str__(self)->str:
+    def remove_duplicatas(self):
+        '''
+        Remove duplicatas da lista
+        '''
+        if self.estaVazia():
+            return
+
+        cursor = self.__head
+        while cursor.next != None:
+            if cursor.data == cursor.next.data:
+                cursor.next = cursor.next.next
+                self.__tamanho -= 1
+            else:
+                cursor = cursor.next
+
+    def __str__(self):
         '''
         Retorna uma representação em string da lista
         '''
@@ -245,15 +244,16 @@ class Lista:
             str += f'{cursor.data}, '
             cursor = cursor.next
 
-        str = str.rstrip(', ') + ' ]'
+        str = str.rstrip(', ') + " ]"
         return str
-    
+
     def __len__(self)->int:
         '''
-        Retorna o número de elementos da lista
+        Retorna o número de elementos armazenados na lista
         '''
         return self.__tamanho
 
+    # Métodos para implementação do protocolo "Iterator"
     def __iter__(self)->any:
         self.__ponteiro = self.__head
         return self
@@ -266,6 +266,12 @@ class Lista:
             self.__ponteiro = self.__ponteiro.next
             return carga
     
+    def __getitem__( self, posicao:int):
+        return self.get(posicao)
+    
+    def __setitem__( self, posicao, novaCarga):
+        self.modificar(posicao, novaCarga)
+    
     def __delitem__(self, posicao:int):
         '''
         Método mágico para permitir a remoção de um elemento da lista
@@ -273,33 +279,11 @@ class Lista:
         '''
         self.remover(posicao)
 
-    def __contains__(self, key:any)->bool:
-        '''
-        Método que verifica se uma chave está presente na lista.
-        Acionado em situações de uso do operador "in": "if chave in lista".
-        Argumentos:
-            key(Any): chave do elemento a ser buscado.
-        Retorna:
-            bool: True se a chave estiver na lista e False caso contrário.
-        '''
-        try:
-            self.busca(key)
-            return True
-        except KeyError:
-            return False
-
-    def __getitem__( self, posicao:int):
-        return self.get(posicao)
-    
-    def __setitem__( self, posicao, novaCarga):
-        self.modificar(posicao, novaCarga)
-
     # Método mágico para emular o comportamento do objeto à chamada da
     # função reversed()
     def __reversed__(self):
         for i in range(self.__tamanho,0,-1):
             yield self.get( i ) 
-
 
 
 

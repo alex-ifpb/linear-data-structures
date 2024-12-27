@@ -1,9 +1,9 @@
-# from fila_sequencial.FilaSequencialCircularList import *
-# from fila_encadeada.FilaEncadeadaNoCabeca import *
-# from fila_encadeada.FilaEncadeadaHeadAndTail import *
-from fila_sequencial.FilaSequencialCircularNumPy import *
+# from fila_encadeada.FilaEncadeadaNoCabeca import Fila, FilaError
+# from fila_encadeada.FilaEncadeadaHeadAndTail import Fila, FilaError
+from fila_sequencial.FilaSequencialCircularNumPy import Fila, FilaError
 
 f = Fila()
+
 try:
     print(f)
     for i in range(1,4):
@@ -12,10 +12,10 @@ try:
     
     print('Tamanho: ', len(f))
     print(f)
-    print('Elemento da frente: ', f.elementoDaFrente())
+    print('Elemento da frente: ', f.frente())
   
     #print(f.elemento(-8))
-    print('Elemento 2: ', f.elemento(2))
+    print('Elemento 2: ', f.get(2))
     #print(f.elemento('a'))
 
     print('Busca(20):', f.busca(20))
@@ -28,6 +28,16 @@ try:
  
     print('desenfileirar():', f.desenfileirar())
     print(f)
+
+    print('Testando o __contains__():')
+    print(30 in f)
+
+    print('Testando o __iter__():')
+    for carga in f: # da base em direção ao topo
+        print(carga, end=' ')
+
+    print('\nTestando o __getitem__():')
+    print(f[4])
 
 
  

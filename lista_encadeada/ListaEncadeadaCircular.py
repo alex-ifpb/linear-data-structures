@@ -53,7 +53,7 @@ class Lista:
             False caso contrário'''
         return self.__tamanho == 0
 
-    def elemento(self, posicao:int)->any:
+    def get(self, posicao:int)->any:
         '''
         Retorna a carga armazenada no nó correspondente à posicao indicada.
         Parâmetros:
@@ -263,7 +263,7 @@ class Lista:
             if (cursor == self.__head):
                 break
 
-        str = str[:-2] + " ]"
+        str = str.rstrip(', ') + " ]"
         return str
 
     def __len__(self)->int:
@@ -309,16 +309,23 @@ class Lista:
         return carga
     
     def __getitem__( self, posicao:int):
-        return self.elemento(posicao)
+        return self.get(posicao)
     
     def __setitem__( self, posicao, novaCarga):
         self.modificar(posicao, novaCarga)
+    
+    def __delitem__(self, posicao:int):
+        '''
+        Método mágico para permitir a remoção de um elemento da lista
+        utilizando a notação de colchetes.
+        '''
+        self.remover(posicao)
 
     # Método mágico para emular o comportamento do objeto à chamada da
     # função reversed()
     def __reversed__(self):
         for i in range(self.__tamanho,0,-1):
-            yield self.elemento( i ) 
+            yield self.get( i ) 
 
 
 

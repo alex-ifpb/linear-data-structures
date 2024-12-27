@@ -16,7 +16,7 @@ class Pilha:
     """Classe que implementa a estrutura de dados "Pilha" utilizando a técnica sequencial.
        A classe permite que qualquer tipo de dado seja armazenada na pilha.
 
-     Attributes:
+     Atributos:
         dado (numpy.ndarray): array de armazenamento dos dados da pilha
         topo (int): um número inteiro que representa o índice do elemento
              que está no topo da pilha
@@ -44,7 +44,20 @@ class Pilha:
             if(p.estaVazia()): 
                <instruções>
         """
-        return True if self.__topo==-1 else False
+        return self.__topo == -1 
+    
+    def estaCheia(self)->bool:
+        """ Método que verifica se a pilha está cheia
+
+        Returns:
+            boolean: True se a pilha estiver cheia, False caso contrário
+
+        Examples:
+            p = Pilha()
+            if(p.estaCheia()): 
+               <instruções>
+        """
+        return self.__topo == len(self.__dado) - 1 
 
     def __len__(self)->int:
         """ Método que consulta a quantidade de elementos existentes na pilha
@@ -59,7 +72,7 @@ class Pilha:
         return self.__topo + 1
 
 
-    def elemento(self, posicao:int)->any:
+    def get(self, posicao:int)->any:
         """ Método que recupera o valor armazenado em um determinado elemento da pilha
 
         Argumentos:
@@ -78,7 +91,7 @@ class Pilha:
                       quantidade de elementos existentes na pilha.                      
         Examples:
             p = Pilha()
-            print (p.elemento(3))
+            print (p.get(3))
         """
         try:
             if self.estaVazia():
@@ -107,17 +120,17 @@ class Pilha:
                  pilha, em direção ao topo
 
         Raises:
-            PilhaError: Exceção lançada quando a chave não 
+            KeyError: Exceção lançada quando a chave não 
                   estiver presente na pilha.
 
         Examples:
             p = Pilha()
-            print (p.elemento(40)) 
+            print (p.get(40)) 
         """        
         for i in range(self.__topo+1):
             if (self.__dado[i] == chave):
                 return i+1
-        raise PilhaError(f'Chave {chave} nao esta na lista')
+        raise KeyError(f'Chave {chave} nao esta na lista')
         #    não dá pra fazer com o np.where, pois ele vai procurar no array todo
         #    resultado = np.where(self.__dado == valor)
         #    return resultado[0][0]
@@ -138,7 +151,7 @@ class Pilha:
             print(dado) 
         """
         try:
-            return self.__dado[-1]
+            return self.__dado[self.__topo]
         except IndexError:
             raise PilhaError(f'Pilha Vazia. Não há elemento no topo')
         except:
@@ -195,3 +208,35 @@ class Pilha:
         s = s.rstrip(',') # remove a última vírgula
         s += ']<-topo'
         return s
+
+    def __iter__(self)->any:
+        self.__index = 0
+        return self
+    
+    def __next__(self)->any:
+        if (self.__index > self.__topo):
+            raise StopIteration
+        else:
+            carga = self.__dado[self.__index]
+            self.__index += 1
+            return carga
+
+    def __contains__(self, key:any)->bool:
+        '''
+        Método que verifica se uma chave está presente na pilha.
+        Acionado em situações de uso do operador "in": "if chave in pilha".
+        Argumentos:
+            key(Any): chave do elemento a ser buscado.
+        Retorna:
+            bool: True se a chave estiver na pilha e False caso contrário.
+        '''
+        try:
+            self.busca(key)
+            return True
+        except KeyError:
+            return False
+
+    def __getitem__( self, posicao:int):
+        return self.get(posicao)
+    
+      

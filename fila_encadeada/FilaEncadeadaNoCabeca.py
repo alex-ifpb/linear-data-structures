@@ -89,7 +89,7 @@ class Fila:
         """        
         return self.__head.tamanho
 
-    def elementoDaFrente(self)->any:
+    def frente(self)->any:
         """ Método que recupera o conteudo armazenado no elemento da frente da fila,
             sem removê-lo.
 
@@ -104,7 +104,7 @@ class Fila:
             print (f.elementoDaFrente()) # exibe 10
         """
         if self.estaVazia():
-            raise FilaError(f'Fila Vazia. Não há elemento a recuperar.')
+            raise FilaError(f'Fila está Vazia.')
         return self.__head.inicio.carga
 
     def busca(self, chave:any)->int:
@@ -121,7 +121,7 @@ class Fila:
                  encontrada a "chave" de busca.
 
         Raises:
-            FilaError: Exceção lançada quando o argumento "key"
+            KeyError: Exceção lançada quando o argumento "key"
                   não está presente na fila.
 
         Examples:
@@ -138,9 +138,9 @@ class Fila:
             cursor = cursor.prox
             contador += 1
 
-        raise FilaError(f'Chave {chave} inexistente na fila')
+        raise KeyError(f'Chave {chave} inexistente na fila')
 
-    def elemento(self, posicao:int)->any:
+    def get(self, posicao:int)->any:
         """ Método que recupera o conteudo armazenado em uma determinada posição
             da fila, sem removê-lo.
 
@@ -157,7 +157,7 @@ class Fila:
         Examples:
             f = Fila()
             ...   # considere que temos internamente a fila  frente->[10,20,30,40]
-            print (f.elemento(3)) # retorna 30
+            print (f.get(3)) # retorna 30
         """
         try:
             if self.estaVazia():
@@ -216,20 +216,15 @@ class Fila:
             print(f) # exibe [20,30,40]
             print(dado) # exibe 10
         """
-        try:
-            assert not self.estaVazia()
+        carga = self.frente() # se estiver vazia, a exceção FilaError é lançada
 
-            carga = self.__head.inicio.carga
+        if self.__head.tamanho ==1:
+            self.__head.fim = None
 
-            if self.__head.tamanho ==1:
-                self.__head.fim = None
-
-            self.__head.inicio = self.__head.inicio.prox
-            self.__head.tamanho -= 1
-            return carga
+        self.__head.inicio = self.__head.inicio.prox
+        self.__head.tamanho -= 1
+        return carga
             
-        except AssertionError as ae:
-            raise FilaError(f'A fila está vazia! Não é possivel remover elementos')
                     
     def __str__(self):
         """ Método que retorna uma string com a ordem dos elementos
@@ -241,5 +236,35 @@ class Fila:
             s += f'{cursor.carga}, ' 
             cursor = cursor.prox
         return s[:-2] + " ]" if not self.estaVazia() else  s + ' ]'
+
+    def __iter__(self)->any:
+        self.__cursor = self.__head.inicio
+        return self
+    
+    def __next__(self)->any:
+        if (self.__cursor is None):
+            raise StopIteration
+        else:
+            carga = self.__cursor.carga
+            self.__cursor = self.__cursor.prox
+            return carga
+
+    def __contains__(self, key:any)->bool:
+        '''
+        Método que verifica se uma chave está presente na fila.
+        Acionado em situações de uso do operador "in": "if chave in fila".
+        Argumentos:
+            key(Any): chave do elemento a ser buscado.
+        Retorna:
+            bool: True se a chave estiver na fila e False caso contrário.
+        '''
+        try:
+            self.busca(key)
+            return True
+        except KeyError:
+            return False
+
+    def __getitem__( self, posicao:int):
+        return self.get(posicao)    
        
 

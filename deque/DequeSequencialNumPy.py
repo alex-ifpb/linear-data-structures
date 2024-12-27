@@ -41,130 +41,228 @@ class Deque:
         self.__rear  = 0
         self.__front = 0
     
-    def isEmpty(self):
+    def estaVazia(self):
         '''
-        check if the deque is empty
+        Verifica se o deque está vazio
         Returns:
-            boolean: True if the deque is empty, False otherwise
+            boolean: True se o deque estiver vazio, False caso contrário
         '''
         return self.__size == 0
     
-    def isFull(self):
+    def estaCheia(self):
         '''
-        check if the deque is full
+        Verifica se o deque está cheio
         Returns:
-            boolean: True if the deque is full, False otherwise
+            boolean: True se o deque estiver cheio, False caso contrário
         '''
         return self.__size == len(self.__items)
 
     def __len__(self):
         '''
-        return the number of elements inside the deque
+        Retorna o número de elementos no deque
         Returns:
-            int: the number of elements in the deque
+            int: o número de elementos no deque
         '''
         return self.__size
 
-    def addRear(self, value:any):
+    def add_cauda(self, carga:any):
         '''
-        add an element to the rear of the deque
+        Adiciona um elemento na extremidade traseira do deque
         Args:
-            value (any): the value to be added to the rear of the deque
+            carga (any): o valor a ser adicionado na extremidade traseira do deque
         Raises:
-            DequeError: exception raised when the deque is full
+            DequeError: exceção lançada quando o deque está cheio
         '''
-        if self.isFull():
-            raise DequeError("O Deque está cheio")
-        if self.isEmpty():
+        if self.estaCheia():
+            raise DequeError("add_cauda(): O Deque está cheio")  
+        elif self.estaVazia(): # faz cauda e frente apontarem para o mesmo lugar
             self.__reset()
         else:
             self.__rear = (self.__rear + 1) % len(self.__items)
-        self.__items[self.__rear] = value
+        self.__items[self.__rear] = carga
         self.__size += 1
     
-    def addFront(self, value:any):
+    def add_frente(self, carga:any):
         '''
-        add an element to the front of the deque
+        Adiciona um elemento na extremidade frontal do deque
         Args:
-            value (any): the value to be added to the front of the deque
+            carga (any): o valor a ser adicionado na extremidade frontal do deque
         Raises:
-            DequeError: exception raised when the deque is full
+            DequeError: exceção lançada quando o deque está cheio
         '''
-        if self.isFull():
-            raise DequeError("O Deque está cheio")
-        if self.isEmpty():
+        if self.estaCheia():
+            raise DequeError("add_frente(): O Deque está cheio")
+        elif self.estaVazia():
             self.__reset()
+        elif self.__front == 0:
+            self.__front = len(self.__items) - 1
         else:
-            self.__front = (self.__front - 1) % len(self.__items)
-        self.__items[self.__front] = value
+            self.__front -= 1
+
+        self.__items[self.__front] = carga
         self.__size += 1
 
-    def removeRear(self):
+    def remove_cauda(self)->any:
         '''
-        remove an element from the rear of the deque
+        Remove um elemento da extremidade traseira do deque
         Returns:
-            any: the element removed from the rear of the deque
+            any: o elemento removido da extremidade traseira do deque
         Raises:
-            DequeError: exception raised when the deque is empty
+            DequeError: exceção lançada quando o deque está vazio
         '''
-        if self.isEmpty():
-            raise DequeError("O Deque está vazio")
-        value = self.__items[self.__rear]
-        self.__rear = (self.__rear - 1) % len(self.__items)
+        if self.estaVazia():
+            raise DequeError("remove_cauda(): O Deque está vazio")
+        carga = self.__items[self.__rear]
+        if self.__rear == self.__front:
+            self.__reset()
+        elif self.__rear == 0:
+            self.__rear = len(self.__items) - 1
+        else:
+            self.__rear -= 1
         self.__size -= 1
-        return value
+        return carga
     
-    def removeFront(self):
+    def remove_frente(self):
         '''
-        remove an element from the front of the deque
+        Remove um elemento da extremidade frontal do deque
         Returns:
-            any: the element removed from the front of the deque
+            any: o elemento removido da extremidade frontal do deque
         Raises:
-            DequeError: exception raised when the deque is empty
+            DequeError: exceção lançada quando o deque está vazio
         '''
-        if self.isEmpty():
-            raise DequeError("O Deque está vazio")
-        value = self.__items[self.__front]
+        if self.estaVazia():
+            raise DequeError("remove_frente(): O Deque está vazio")
+        carga = self.__items[self.__front]
         self.__front = (self.__front + 1) % len(self.__items)
         self.__size -= 1
-        return value
+        return carga
     
-    def peekRear(self):
+    def cauda(self):
         '''
-        return the element at the rear of the deque without removing it
+        Retorna o elemento da extremidade traseira do deque sem removê-lo
         Returns:
-            any: the element at the rear of the deque
+            any: o elemento da extremidade traseira do deque
         Raises:
-            DequeError: exception raised when the deque is empty
+            DequeError: exceção lançada quando o deque está vazio
         '''
-        if self.isEmpty():
-            raise DequeError("O Deque está vazio")
+        if self.estaVazia():
+            raise DequeError("cauda(): O Deque está vazio")
         return self.__items[self.__rear]
     
-    def peekFront(self):
+    def frente(self):
         '''
-        return the element at the front of the deque without removing it
+        Retorna o elemento da extremidade frontal do deque sem removê-lo
         Returns:
-            any: the element at the front of the deque
+            any: o elemento da extremidade frontal do deque
         Raises:
-            DequeError: exception raised when the deque is empty
+            DequeError: exceção lançada quando o deque está vazio
         '''
-        if self.isEmpty():
-            raise DequeError("O Deque está vazio")
+        if self.estaVazia():
+            raise DequeError("frente(): O Deque está vazio")
         return self.__items[self.__front]
+
+    def busca(self, key: any)->int:
+        """ Método que recupera a posicao ordenada, dentro do deque, em que se
+            encontra um valor chave passado como argumento. No caso de haver
+            mais de uma ocorrência do valor, a primeira ocorrência será 
+            retornada. O percurso é feito da frente para a cauda.
+
+        Args:
+            key: um item de dado que deseja procurar no deque
+        
+        Returns:
+            int: um número inteiro representando a posição, no deque, em que foi
+                 encontrada a "chave" de busca.
+
+        Raises:
+            KeyError: Exceção lançada quando o argumento "key"
+                  não está presente na fila.
+
+        Examples:
+            d = Deque()
+            ...   # considere que temos internamente a o deque  frente->[10,20,30,40]<-cauda
+            print (d.busca(40)) # exibe 4
+        """
+        frente = self.__front
+        for i in range(1,self.__size+1):
+            if self.__items[frente] == key:
+                return i
+            frente = (frente + 1)% len(self.__items)
+                
+        raise KeyError(f'A chave {key} não foi encontrada')
+
+    def get(self, posicao:int)->any:
+        """ Recupera a carga armazenada em uma determinada posição
+            no deque, sem removê-lo. O sentido de busca é da frente para a cauda.
+        Args:
+            posicao(int): um número inteiro entre 1 e n, onde n é o número
+                          de elementos no deque.
+
+        Returns:
+            any: a carga armazenada na posição indicada.
+
+        Raises:
+            DequeError: Exceção lançada quando a posição não é válida 
+        Examples:
+            d = Deque()
+            ...   # considere que temos internamente o deque  frente->[10,20,30,40]<-cauda
+            print (f.get(3)) # retorna 30
+        """
+        try:
+            assert posicao > 0 and posicao <= self.__size
+            frente = self.__front
+            for i in range(posicao-1):
+                frente = (frente + 1) % len(self.__items)
+
+            return self.__items[frente]
+        except AssertionError:
+            raise DequeError(f'get(): Posicao inválida para o deque atual com {self.__size} elementos')
+
         
     def __str__(self):
         '''
-        return a string representation of the deque
+        Retorna uma representação do deque em forma de string
         Returns:
-            str: a string representation of the deque
+            str: uma representação do deque em forma de string
         '''
-        s = 'front->['
+        s = 'frente->['
         next = self.__front
         for i in range(self.__size):
             s += str(self.__items[next]) + ','
             next = (next + 1) % len(self.__items)  
         s = s.rstrip(',') # remove a última vírgula
-        s += ']<-rear\n'
-        s += f'front {self.__front} | rear {self.__rear} | size {self.__size}   '
+        s += ']<-cauda\n'
+        # s += f'front {self.__front} | rear {self.__rear} | size {self.__size}   '
         return s
+
+    def __iter__(self)->any:
+        self.__index = 1
+        self.__cursor = self.__front
+        return self
+    
+    def __next__(self)->any:
+        if (self.__index > self.__size):
+            raise StopIteration
+        else:
+            carga = self.__items[self.__cursor]
+            self.__cursor = (self.__cursor + 1) % len(self.__items)
+            self.__index += 1
+            return carga
+
+    def __contains__(self, key:any)->bool:
+        '''
+        Método que verifica se uma chave está presente no deque.
+        Acionado em situações de uso do operador "in": "if chave in deque".
+        Argumentos:
+            key(Any): chave do elemento a ser buscado.
+        Retorna:
+            bool: True se a chave estiver no deque e False caso contrário.
+        '''
+        try:
+            self.busca(key)
+            return True
+        except KeyError:
+            return False
+
+    def __getitem__( self, posicao:int):
+        return self.get(posicao)    

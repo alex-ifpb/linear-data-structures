@@ -76,7 +76,7 @@ class Lista:
         return self.__final
 
 
-    def elemento(self, posicao:int)->any:
+    def get(self, posicao:int)->any:
         """ Método que recupera o valor armazenado em um determinado elemento da lista
 
         Args:
@@ -96,7 +96,7 @@ class Lista:
             lst = Lista()
             ...   # considere que temos internamente a lista [10,20,30,40]
             posicao = 5
-            print (lst.elemento(3)) # exibe 30
+            print (lst.get(3)) # exibe 30
         """
         try:
             if posicao > 0 and posicao > len(self):
@@ -124,7 +124,7 @@ class Lista:
             ...   # considere que temos internamente a lista [10,20,30,40]
             posicao = 3
             lst.modificar( posicao, 55)
-            print (lst.elemento( posicao )) # exibe 55
+            print (lst.get( posicao )) # exibe 55
         """
         try:
             assert posicao > 0 and posicao <= len(self)
@@ -149,19 +149,19 @@ class Lista:
                  encontrado "valor".
 
         Raises:
-            ListaError: Exceção lançada quando o argumento "chave"
+            KeyError: Exceção lançada quando o argumento "chave"
                   não está presente na lista.
 
         Examples:
             lst = Lista()
             ...   # considere que temos internamente a lista [10,20,30,40]
-            print (lst.elemento(40)) # exibe 4
+            print (lst.get(40)) # exibe 4
         """
         
         for i in range(self.__final):
             if (self.__dado[i] == chave):
                 return i+1
-        raise ListaError(f'Chave {chave} nao esta na lista')
+        raise KeyError(f'Chave {chave} nao esta na lista')
 
 
     def inserir(self, posicao:int, carga:any ):
@@ -267,7 +267,34 @@ class Lista:
             return s
         for i in range(self.__final):
             s += f'{self.__dado[i]}, '
-        s = s[:-2] + " ]"
+        s = s.rstrip(', ') + ' ]'
+        # s = s[:-2] + " ]"
         return s
        
+    def __delitem__(self, posicao:int):
+        '''
+        Método mágico para permitir a remoção de um elemento da lista
+        utilizando a notação de colchetes.
+        '''
+        self.remover(posicao)
 
+    def __contains__(self, key:any)->bool:
+        '''
+        Método que verifica se uma chave está presente na lista.
+        Acionado em situações de uso do operador "in": "if chave in lista".
+        Argumentos:
+            key(Any): chave do elemento a ser buscado.
+        Retorna:
+            bool: True se a chave estiver na lista e False caso contrário.
+        '''
+        try:
+            self.busca(key)
+            return True
+        except KeyError:
+            return False
+
+    def __getitem__( self, posicao:int):
+        return self.get(posicao)
+    
+    def __setitem__( self, posicao, novaCarga):
+        self.modificar(posicao, novaCarga)

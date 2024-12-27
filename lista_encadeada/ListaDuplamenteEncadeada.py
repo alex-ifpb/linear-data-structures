@@ -55,7 +55,7 @@ class Lista:
         '''
         return self.__tamanho == 0
 
-    def elemento(self, posicao:int)->any:
+    def get(self, posicao:int)->any:
         '''
         Retorna a carga armazenada no nó correspondente à posicao indicada.
         Parâmetros:
@@ -87,7 +87,7 @@ class Lista:
         Retorno:
             a posição do nó que contém a chave de busca
         Raises:
-            ListaError: caso a chave não seja encontrada ou a lista esteja vazia
+            KeyError: caso a chave não seja encontrada ou a lista esteja vazia
         '''        
         cont = 1
         cursor = self.__head
@@ -97,7 +97,7 @@ class Lista:
             cont += 1
             cursor = cursor.prox
 
-        raise ListaError(f'Chave {chave} não encontrada na Lista')        
+        raise KeyError(f'Chave {chave} não encontrada na Lista')        
 
     def modificar(self, posicao:int, novaCarga:any):
         '''
@@ -238,19 +238,22 @@ class Lista:
             s += f'{cursor.carga}, '
             # incremento do cursor
             cursor = cursor.prox
-        s += ' ]'
+        s = s.rstrip(', ') + ' ]'
         return s
 
     # Método mágico em Python, que quando usado em uma classe, permite que
     # a instância da classe utilize a sintaxe do operador  [] para indexar
     # seus elementos
     def __getitem__( self, posicao:int):
-        return self.elemento(posicao)
+        return self.get(posicao)
     
     def __setitem__( self, posicao, novaCarga):
         self.modificar(posicao, novaCarga)
 
     def __iter__(self)->any:
+        '''
+        Método mágico que permite a iteração sobre os elementos da lista.
+        '''
         self.__ponteiro = self.__head
         return self
     
@@ -262,17 +265,42 @@ class Lista:
             self.__ponteiro = self.__ponteiro.prox
             return carga
     
+    def __delitem__(self, posicao:int):
+        '''
+        Método mágico para permitir a remoção de um elemento da lista
+        utilizando a notação de colchetes.
+        '''
+        self.remover(posicao)
+    
     def __len__(self):
         return self.__tamanho
 
-
+    def __contains__(self, key:any)->bool:
+        '''
+        Método que verifica se uma chave está presente na lista.
+        Acionado em situações de uso do operador "in": "if chave in lista".
+        Argumentos:
+            key(Any): chave do elemento a ser buscado.
+        Retorna:
+            bool: True se a chave estiver na tabela de dispersão e False caso contrário.
+        '''
+        try:
+            self.busca(key)
+            return True
+        except KeyError:
+            return False
+        
     # Método mágico para emular o comportamento do objeto à chamada da
     # função reversed()
     # def __reversed__(self):
     #     for i in range(self.__tamanho,0,-1):
-    #         yield self.elemento( i ) 
+    #         yield self.get( i ) 
     
     def __reversed__(self):
+        '''
+        Método mágico para emular o comportamento do objeto à chamada da
+        função reversed()
+        '''
         self.__ponteiro = self.__head
         #posiciona no último elemento
         while(self.__ponteiro.prox is not None):

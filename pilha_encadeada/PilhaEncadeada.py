@@ -88,7 +88,7 @@ class Pilha:
 
         return self.__tamanho
 
-    def elemento(self, posicao:int)->any:
+    def get(self, posicao:int)->any:
         """ Método que recupera o valor armazenado em um determinado elemento da pilha
 
         Argumentos:
@@ -108,7 +108,7 @@ class Pilha:
                       quantidade de elementos existentes na pilha.                      
         Examplo de uso:
             p = Pilha()
-            print (p.elemento(3)) 
+            print (p.get(3)) 
         """
         try:
             assert not self.estaVazia(), 'A pilha está vazia'
@@ -140,7 +140,7 @@ class Pilha:
                  pilha (1), em direção ao topo (n)
 
         Raises:
-            PilhaError: Exceção lançada quando a chave não 
+            KeyError: Exceção lançada quando a chave não 
                   estiver presente na pilha.
 
         Examplo de uso:
@@ -156,7 +156,7 @@ class Pilha:
             cursor = cursor.prox
             contador -= 1
 
-        raise PilhaError(f'Chave {chave} nao esta na pilha')
+        raise KeyError(f'Chave {chave} nao esta na pilha')
         
     def topo(self)->any:
         """ Método que devolve a carga que se encontra no topo da pilha, sem desempilhá-la
@@ -233,5 +233,34 @@ class Pilha:
         s += ']'
         return s
 
+    def __iter__(self)->any:
+        self.__cursor = 1
+        return self
+    
+    def __next__(self)->any:
+        if (self.__cursor > self.__tamanho):
+            raise StopIteration
+        else:
+            carga = self.get(self.__cursor)
+            self.__cursor += 1
+            return carga
+
+    def __contains__(self, key:any)->bool:
+        '''
+        Método que verifica se uma chave está presente na pilha.
+        Acionado em situações de uso do operador "in": "if chave in pilha".
+        Argumentos:
+            key(Any): chave do elemento a ser buscado.
+        Retorna:
+            bool: True se a chave estiver na pilha e False caso contrário.
+        '''
+        try:
+            self.busca(key)
+            return True
+        except KeyError:
+            return False
+
+    def __getitem__( self, posicao:int):
+        return self.get(posicao)
  
 
